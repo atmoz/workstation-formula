@@ -1,0 +1,19 @@
+#!/bin/bash
+set -ex
+
+encrypted=~/.password-store/privat/salt-laptop-pillar.gpg
+secrets=pillar/secrets.sls
+
+# create temporary file (readable only to root)
+sudo touch $secrets
+sudo chmod 600 $secrets
+
+# decrypt pillar data with normal user, save to file as root
+gpg -d $encrypted | sudo tee $secrets > /dev/null
+
+# run salt
+sudo salt-call --local --file-root=states --pillar-root=pillar ${@:-state.apply}
+
+# remove temporary file (only manage secrets in the encrypted file)
+sudo rm $secrets
+
