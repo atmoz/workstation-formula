@@ -40,7 +40,7 @@ mkfs.ext4 "${part_root}"
 mkfs.ext4 "${part_home}"
 
 mount "${part_root}" /mnt
-pacstrap /mnt base grub salt git gnupg
+pacstrap /mnt base grub intel-ucode salt git gnupg
 genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
