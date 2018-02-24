@@ -1,0 +1,48 @@
+#!/bin/bash
+# Forked from https://github.com/mdaffin/salt-arch
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+if grep -qs /mnt /proc/mounts; then
+    echo "/mnt is already mounted. Unmount it first, or edit this script." >&2
+    exit 1
+fi
+
+devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
+device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
+clear
+
+### Set up logging ###
+exec 1> >(tee "stdout.log")
+exec 2> >(tee "stderr.log")
+
+### Setup the disk and partitions ###
+parted --script "${device}" -- mklabel gpt \
+mkpart primary fat32 1Mib 2MiB \
+set 1 boot on \
+mkpart primary ext4 2MiB 10GiB \
+mkpart primary ext4 10GiB 100%
+
+# Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
+# but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
+part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
+part_home="$(ls ${device}* | grep -E "^${device}p?3$")"
+
+mkfs.ext4 "${part_root}"
+mkfs.ext4 "${part_home}"
+
+mount "${part_root}" /mnt
+pacstrap /mnt base salt python2-pygit2 git gpg wireless_tools
+
+echo "atmoz-laptop" > /mnt/etc/hostname
+genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+
+arch-chroot /mnt sh -c "curl https://keybase.io/atmoz/pgp_keys.asc | gpg --import"
+arch-chroot /mnt sh -c "git clone https://github.com/atmoz/salt-laptop.git /srv/salt"
+if ! arch-chroot /mnt sh -c "cd /srv/salt && git verify-commit HEAD"; then
+    echo "GPG signature check failed!" >&2
+    exit 1
+fi
+
+arch-chroot /mnt sh -c "cd /srv/salt && ./salt-call state.apply pillar='{"bootstrap": True}'"
