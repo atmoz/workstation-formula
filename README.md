@@ -1,10 +1,10 @@
 # Bootstrap
 
-* Boot arch linux installation ISO
-* Copy `laptop-pillar-secrets.gpg` (you know where to find it) to current dir
+* Boot into Arch Linux installation ISO
+* Copy `laptop-pillar-secrets.gpg` to current dir (you know where to find it)
 * Download: `curl -L bootstrap.atmoz.net > bootstrap`
 * Verify: `less bootstrap`
-* Run: `chmod +x bootstrap && ./bootstrap`
+* Run: `sh bootstrap`
 
 # Post install updates
 
