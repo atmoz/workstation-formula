@@ -25,7 +25,7 @@ clear
 
 ### Setup the disk and partitions ###
 parted --script "${device}" -- mklabel gpt \
-    mkpart primary fat32 1Mib 2MiB \
+    mkpart primary bios_grub 1Mib 2MiB \
     set 1 boot on \
     mkpart primary ext4 2MiB 10GiB \
     mkpart primary ext4 10GiB 100%
@@ -40,10 +40,11 @@ mkfs.ext4 "${part_root}"
 mkfs.ext4 "${part_home}"
 
 mount "${part_root}" /mnt
-pacstrap /mnt base salt git gnupg wireless_tools
+pacstrap /mnt base grub salt git gnupg
+genfstab -U /mnt >> /mnt/etc/fstab
 
-echo "atmoz-laptop" > /mnt/etc/hostname
-genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
+    && grub-mkconfig -o /boot/grub/grub.cfg"
 
 arch-chroot /mnt sh -c "curl $gpgKeyUrl | gpg --import"
 arch-chroot /mnt sh -c "git clone $saltStateRepo /srv/salt"
