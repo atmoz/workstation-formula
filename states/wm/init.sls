@@ -1,0 +1,3 @@
+include:
+  - .xorg
+  - .i3

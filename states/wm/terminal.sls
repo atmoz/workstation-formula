@@ -1,0 +1,2 @@
+sakura:
+  pkg.installed
