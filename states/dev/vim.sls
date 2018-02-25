@@ -1,2 +1,2 @@
-gvim: # gvim includes clipboard
+gvim:
   pkg.installed

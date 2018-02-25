@@ -1,0 +1,5 @@
+include:
+  - .vim
+  - .git
+  - .c++
+
