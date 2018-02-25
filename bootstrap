@@ -24,34 +24,21 @@ saltStateRepo=https://github.com/atmoz/salt-laptop.git
 #####################################################################
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
+device=$(dialog --stdout --menu "Select disk to format" 0 0 0 $devicelist) || exit 1
 clear
 
 #####################################################################
 ## Setup the disk and partitions
 #####################################################################
 
-parted --script "${device}" -- mktable gpt \
+parted --script $device -- mktable gpt \
     mkpart primary ext2 1Mib 2MiB \
     set 1 bios_grub on \
-    mkpart primary ext4 2MiB 10GiB \
-    mkpart primary ext4 10GiB 100%
+    mkpart primary ext4 2MiB 100%
 
-# Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
-# but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
-part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
-part_home="$(ls ${device}* | grep -E "^${device}p?3$")"
-
-#####################################################################
-## Format partitions
-#####################################################################
-
-mkfs.ext4 "${part_root}"
-mount "${part_root}" /mnt
-
-mkfs.ext4 "${part_home}"
-mkdir /mnt/home
-mount "${part_home}" /mnt/home
+partition="${device}2"
+mkfs.ext4 $partition
+mount $partition /mnt
 
 #####################################################################
 ## Install Arch Linux
