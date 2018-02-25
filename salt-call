@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -euxo pipefail
 
 repo="$(dirname "$(readlink -f "$0")")"
 encrypted=~/.password-store/privat/laptop-pillar-secrets.gpg
@@ -17,7 +17,7 @@ sudo salt-call \
     --local \
     --file-root=$repo/states \
     --pillar-root=$repo/pillar \
-    ${@:-state.apply}
+    "${@:-state.apply}"
 
 # remove temporary file (only manage secrets in the encrypted file)
 sudo rm $tempSecrets

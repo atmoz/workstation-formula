@@ -1,3 +1,5 @@
+bootstrap: false
+
 hostname: atmoz-laptop
 
 users:

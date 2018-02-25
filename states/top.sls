@@ -7,6 +7,7 @@ base:
     - core.time
     - core.wheel
     - core.network
+    - dev.vim
     - dev.git
     - dev.c++
     - browser

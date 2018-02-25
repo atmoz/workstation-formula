@@ -1,6 +1,6 @@
 #!/bin/bash
 # Forked from https://github.com/mdaffin/salt-arch
-set -uo pipefail
+set -Eeuxo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 fail() {
@@ -19,35 +19,57 @@ fi
 gpgKeyUrl=https://keybase.io/atmoz/pgp_keys.asc
 saltStateRepo=https://github.com/atmoz/salt-laptop.git
 
+#####################################################################
+## Select disk
+#####################################################################
+
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
 clear
 
-### Setup the disk and partitions ###
-parted --script "${device}" -- mklabel gpt \
-    mkpart primary bios_grub 1Mib 2MiB \
-    set 1 boot on \
+#####################################################################
+## Setup the disk and partitions
+#####################################################################
+
+parted --script "${device}" -- mktable gpt \
+    mkpart primary ext2 1Mib 2MiB \
+    set 1 bios_grub on \
     mkpart primary ext4 2MiB 10GiB \
     mkpart primary ext4 10GiB 100%
 
 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
-part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
 part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
 part_home="$(ls ${device}* | grep -E "^${device}p?3$")"
 
-mkfs.ext4 "${part_root}"
-mkfs.ext4 "${part_home}"
+#####################################################################
+## Format partitions
+#####################################################################
 
+mkfs.ext4 "${part_root}"
 mount "${part_root}" /mnt
+
+mkfs.ext4 "${part_home}"
+mkdir /mnt/home
+mount "${part_home}" /mnt/home
+
+#####################################################################
+## Install Arch Linux
+#####################################################################
+
 pacstrap /mnt base grub intel-ucode salt git gnupg
 genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
     && grub-mkconfig -o /boot/grub/grub.cfg"
 
+#####################################################################
+## Prepare and verify salt states
+#####################################################################
+
 arch-chroot /mnt sh -c "curl $gpgKeyUrl | gpg --import"
 arch-chroot /mnt sh -c "git clone $saltStateRepo /srv/salt"
+
 if ! arch-chroot /mnt sh -c "cd /srv/salt && git verify-commit HEAD"; then
     fail "GPG signature check failed!"
 fi
@@ -62,11 +84,22 @@ pillar_roots:
     - /srv/salt/pillar
 EOF
 
-# Use pinentry-curses to unlock yubikey
-rm /usr/bin/pinentry
-ln -s /usr/bin/pinentry-curses /usr/bin/pinentry
+#####################################################################
+## Decrypt secret pillar data
+#####################################################################
+
+rm /usr/bin/pinentry # Default symlink to pinentry-gtk-2
+ln -s /usr/bin/pinentry-tty /usr/bin/pinentry
 
 curl $gpgKeyUrl | gpg --import
-gpg -d /tmp/laptop-pillar-secrets.gpg > /srv/salt/pillar/secrets.sls
+while ! gpg --card-status; do
+    read -p "Insert yubikey and hit ENTER to continue ..."
+done
+
+gpg -d laptop-pillar-secrets.gpg > /mnt/srv/salt/pillar/secrets.sls
+
+#####################################################################
+## Apply salt states
+#####################################################################
 
 arch-chroot /mnt sh -c "salt-call state.apply pillar='{\"bootstrap\": True}'"
