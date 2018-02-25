@@ -62,6 +62,7 @@ if ! arch-chroot /mnt sh -c "cd /srv/salt && git verify-commit HEAD"; then
 fi
 
 cat >/mnt/etc/salt/minion <<EOF
+state_verbose: False
 file_client: local
 file_roots:
   base:
@@ -91,4 +92,5 @@ done
 
 arch-chroot /mnt sh -c "salt-call state.apply core"
 
-echo "Bootstrap complete. Reboot and run state-call to complete install."
+echo "Bootstrap complete."
+echo "Reboot and run 'salt-call state.apply' to complete installation."
