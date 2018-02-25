@@ -83,12 +83,12 @@ while ! gpg --card-status; do
     read -p "Insert yubikey and hit ENTER to continue ..."
 done
 
-secrets=/mnt/srv/salt/pillar/secrets.sls
-( umask 077 && gpg -d laptop-pillar-secrets.gpg > $secrets )
+( umask 077 && gpg -d laptop-pillar-secrets.gpg > /mnt/srv/salt/pillar/secrets.sls )
 
 #####################################################################
-## Apply salt states
+## Apply core state
 #####################################################################
 
-arch-chroot /mnt sh -c "salt-call state.apply pillar='{\"bootstrap\": True}'"
-rm $secrets
+arch-chroot /mnt sh -c "salt-call state.apply core"
+
+echo "Bootstrap complete. Reboot and run state-call to complete install."
