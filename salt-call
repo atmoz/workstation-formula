@@ -5,7 +5,7 @@ repo="$(dirname "$(readlink -f "$0")")"
 encrypted=/home/atmoz/.password-store/private/laptop-pillar-secrets.gpg
 tempSecrets=$repo/pillar/secrets.sls
 
-if [ ! -f "$tempSecret" ]; then
+if [ ! -f "$tempSecrets" ]; then
     if [ ! -f "$encrypted" ]; then
         echo "Missing $encrypted" >&2
         exit 1
