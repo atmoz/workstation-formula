@@ -1,13 +1,19 @@
 #!/bin/bash
 set -euxo pipefail
 
-
 repo="$(dirname "$(readlink -f "$0")")"
 encrypted=/home/atmoz/.password-store/private/laptop-pillar-secrets.gpg
 tempSecrets=$repo/pillar/secrets.sls
 
-# decrypt pillar data with normal user, save to file as root
-( umask 077 && gpg -qd $encrypted | sudo tee $tempSecrets > /dev/null )
+if [ ! -f "$encrypted" ]; then
+    echo "Missing $encrypted" >&2
+    exit 1
+fi
+
+if [ ! -f "$tempSecret" ]; then
+    # decrypt pillar data with normal user, save to file as root
+    ( umask 077 && gpg -qd $encrypted | sudo tee $tempSecrets > /dev/null )
+fi
 
 # run salt
 sudo /usr/bin/salt-call \
