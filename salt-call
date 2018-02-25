@@ -5,12 +5,8 @@ repo="$(dirname "$(readlink -f "$0")")"
 encrypted=~/.password-store/privat/laptop-pillar-secrets.gpg
 tempSecrets=$repo/pillar/secrets.sls
 
-# create temporary file (readable only to root)
-sudo touch $tempSecrets
-sudo chmod 600 $tempSecrets
-
 # decrypt pillar data with normal user, save to file as root
-gpg -d $encrypted | sudo tee $tempSecrets > /dev/null
+( umask 077 && gpg -d $encrypted | sudo tee $tempSecrets > /dev/null )
 
 # run salt
 sudo salt-call \
