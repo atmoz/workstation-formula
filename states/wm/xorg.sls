@@ -1,5 +1,21 @@
 xorg:
-  pkg.installed
+  pkg.installed:
+    - pkgs:
+      - xorg-server
+      - xorg-xinit
+      - xorg-xinput
+      - xorg-xkill
+      - xorg-xsetroot
+      - xorg-xbacklight
+
+fonts:
+  pkg.installed:
+    - pkgs:
+      - ttf-fira-mono
+      - otf-fira-mono
+      - xorg-fonts-100dpi
+      - xorg-fonts-75dpi
+      - xorg-fonts-misc
 
 display-driver:
   pkg.installed:
