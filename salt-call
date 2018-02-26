@@ -1,27 +1,22 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 repo="$(dirname "$(readlink -f "$0")")"
 encrypted=/home/atmoz/.password-store/private/laptop-pillar-secrets.gpg
-tempSecrets=$repo/pillar/secrets.sls
+decrypted=$repo/pillar/secrets.sls
 
-if [ ! -f "$tempSecrets" ]; then
-    if [ ! -f "$encrypted" ]; then
-        echo "Missing $encrypted" >&2
-        exit 1
-    fi
-
-    # decrypt pillar data with normal user, save to file as root
-    ( umask 077 && gpg -qd $encrypted | sudo tee $tempSecrets > /dev/null )
+# Use encrypted secrets, if available in password-store
+if [ -r "$encrypted" ]; then
+    # decrypt pillar data with normal user, store file restricted to root only
+    ( umask 077 && gpg -qd $encrypted | sudo tee $decrypted > /dev/null )
 fi
 
-# run salt
+if [ ! -r "$decrypted" ]; then
+    echo "Missing $decrypted. Aborting." >&2; exit 1
+fi
+
 sudo /usr/bin/salt-call \
     --local \
     --file-root=$repo/states \
     --pillar-root=$repo/pillar \
     "${@:-state.apply}"
-
-# remove temporary file (only manage secrets in the encrypted file)
-sudo rm $tempSecrets
-
