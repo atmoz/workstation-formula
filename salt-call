@@ -6,7 +6,7 @@ encrypted=~/.password-store/private/laptop-pillar-secrets.gpg
 decrypted=$repo/pillar/secrets.sls
 
 # Use encrypted secrets, if available in password-store
-if [ -r "$encrypted" ]; then
+if [ -f "$encrypted" ]; then
     # decrypt pillar data with normal user, store file restricted to root only
     ( umask 077 && gpg -qd $encrypted | sudo tee $decrypted > /dev/null )
 fi
