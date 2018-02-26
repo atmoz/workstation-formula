@@ -3,3 +3,7 @@ include:
   - .git
   - .c++
 
+dev.tools:
+  pkg.installed:
+    - pkgs:
+      - openssh
