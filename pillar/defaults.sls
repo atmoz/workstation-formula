@@ -19,5 +19,3 @@ pacman:
     Server = http://ftp.portlane.com/pub/os/linux/archlinux/$repo/os/$arch
     Server = http://www.mirrorservice.org/sites/ftp.archlinux.org/$repo/os/$arch
 
-home-bin-repo: 'git@github.com:atmoz/bin.git'
-dotfiles-repo: 'git@github.com:atmoz/dotfiles.git'

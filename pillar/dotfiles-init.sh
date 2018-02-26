@@ -1,8 +1,23 @@
 #!/bin/bash
 set -e
 
+# Must clone with https, because salt-call is run with root
+# After clone, we set remote to ssh
+
+bin_repo_pub='https://github.com/atmoz/bin.git'
+bin_repo='git@github.com:atmoz/bin.git'
+
+(
+    git clone $bin_repo_pub bin
+    cd bin
+    git remote set-url origin $dotfiles_repo
+)
+
+dotfiles_repo_pub= 'https://github.com/atmoz/dotfiles.git'
+dotfiles_repo='git@github.com:atmoz/dotfiles.git'
+
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-git clone --bare {{ pillar['dotfiles-repo'] }} $HOME/.dotfiles
+git clone --bare $dotfiles_repo_pub $HOME/.dotfiles
 
 if ! dotfiles checkout; then
     # Backup any exsisting files
@@ -11,3 +26,4 @@ if ! dotfiles checkout; then
 fi
 
 dotfiles checkout
+dotfiles remote set-url origin $dotfiles_repo
