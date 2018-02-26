@@ -1,11 +1,14 @@
+{% set username = 'atmoz' %}
+username: {{ username }}
+
 bootstrap: false
 
-hostname: atmoz-laptop
+hostname: {{ username }}-laptop
 
 users:
   root:
     password: secret
-  atmoz:
+  {{ username }}:
     password: secret
 
 pacman:
@@ -15,3 +18,5 @@ pacman:
     Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch
     Server = http://ftp.portlane.com/pub/os/linux/archlinux/$repo/os/$arch
     Server = http://www.mirrorservice.org/sites/ftp.archlinux.org/$repo/os/$arch
+
+dotfiles-repo: 'git@github.com:atmoz/dotfiles.git'

@@ -8,4 +8,4 @@ pcscd:
   service.running:
     - enable: true
     - require:
-      - pkg: pcslite
+      - pkg: yubikey-gpg-deps

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo="$(dirname "$(readlink -f "$0")")"
-encrypted=/home/atmoz/.password-store/private/laptop-pillar-secrets.gpg
+encrypted=~/.password-store/private/laptop-pillar-secrets.gpg
 decrypted=$repo/pillar/secrets.sls
 
 # Use encrypted secrets, if available in password-store
@@ -11,7 +11,7 @@ if [ -r "$encrypted" ]; then
     ( umask 077 && gpg -qd $encrypted | sudo tee $decrypted > /dev/null )
 fi
 
-if [ ! -r "$decrypted" ]; then
+if [ ! -f "$decrypted" ]; then
     echo "Missing $decrypted. Aborting." >&2; exit 1
 fi
 

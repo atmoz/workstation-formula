@@ -92,5 +92,19 @@ done
 
 arch-chroot /mnt sh -c "salt-call state.apply core"
 
-echo "Bootstrap complete."
-echo "Reboot and run 'salt-call state.apply' to complete installation."
+cat >/mnt/etc/motd <<EOF
+#####################################################################
+## Welcome to a fresh install :-)
+#####################################################################
+
+To complete the installation:
+* Setup a network connection
+* Run 'sudo salt-call state.apply'
+
+EOF
+
+umount -R /mnt
+clear
+
+echo "\nBootstrap complete!\n\nReboot when ready to continue installation."
+
