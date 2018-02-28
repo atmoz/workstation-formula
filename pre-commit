@@ -1,0 +1,31 @@
+#!/bin/bash
+set -eu
+
+fail() {
+  echo >&2 "$@"
+  exit 1
+}
+
+if ! git verify-commit HEAD 2>/dev/null; then
+    fail "Could not verify last commit. Commits must be signed!"
+fi
+
+bootstrapSource=bootstrap
+bootstrapSigned=bootstrap.gpg
+bootstrapDecrypted=$(mktemp --tmpdir signed-bootstrap.XXXX)
+if ! gpg -q --yes -o "$bootstrapDecrypted" --decrypt $bootstrapSigned 2>/dev/null; then
+    fail "Failed to verify $bootstrapSigned"
+fi
+
+if ! diff --brief $bootstrapSource $bootstrapDecrypted; then
+    echo "Signing new version of $bootstrapSource"
+    gpg -q --yes -o $bootstrapSigned --sign $bootstrapSource 2>/dev/null
+    git add $bootstrapSigned
+    fail "You must add $bootstrapSigned and commit again."
+fi
+
+if git ls-files -m | grep -q $bootstrapSigned; then
+    fail "$bootstrapSigned must be included in commit. Aborting."
+fi
+
+exit 0

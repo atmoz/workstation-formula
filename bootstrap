@@ -56,6 +56,7 @@ arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
 
 arch-chroot /mnt sh -c "curl $gpgKeyUrl | gpg --import"
 arch-chroot /mnt sh -c "git clone $saltStateRepo /srv/salt"
+arch-chroot /mnt sh -c "cp /srv/salt/pre-commit /srv/salt/.git/hooks"
 
 if ! arch-chroot /mnt sh -c "cd /srv/salt && git verify-commit HEAD"; then
     fail "GPG signature check failed!"
