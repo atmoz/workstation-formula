@@ -2,6 +2,7 @@ base:
   '*':
     - core
     - system
-    - dev
+    - laptop
     - wm
+    - dev
     - browser
