@@ -4,4 +4,4 @@
     - contents:
       - alias snd-card-0 snd-hda-intel
       - alias sound-slot-0 snd-hda-intel
-      - options snd-hda-intel model=lenovo
+      - options snd-hda-intel index=1,0 model=lenovo

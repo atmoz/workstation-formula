@@ -8,3 +8,4 @@ include:
   - .update
   - .users
   - .wheel
+  - .salt-call
