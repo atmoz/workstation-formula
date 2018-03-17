@@ -8,6 +8,13 @@ fail() {
   exit 1
 }
 
+publicKeyFingerprint=838460D0CBD26750AB26DF8FB9FB68F98F88BA47
+saltStateRepo=https://github.com/atmoz/salt-laptop.git
+
+#####################################################################
+## Conditions
+#####################################################################
+
 if grep -qs /mnt /proc/mounts; then
     fail "/mnt is already mounted. Unmount it first, or edit this script."
 fi
@@ -16,8 +23,9 @@ if [ ! -f laptop-pillar-secrets.gpg ]; then
     fail "Missing laptop-pillar-secrets.gpg. Copy into current dir and try again"
 fi
 
-gpgKeyUrl=https://keybase.io/atmoz/pgp_keys.asc
-saltStateRepo=https://github.com/atmoz/salt-laptop.git
+if ! gpg --check-sigs $publicKeyFingerprint; then
+    fail "Missing public key with fingerprint: $publicKeyFingerprint"
+fi
 
 #####################################################################
 ## Select disk
@@ -54,7 +62,8 @@ arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
 ## Prepare and verify salt states
 #####################################################################
 
-arch-chroot /mnt sh -c "curl $gpgKeyUrl | gpg --import"
+gpg --export -a $publicKeyFingerprint | arch-chroot /mnt sh -c "gpg --import"
+
 arch-chroot /mnt sh -c "git clone $saltStateRepo /srv/salt"
 arch-chroot /mnt sh -c "cp /srv/salt/pre-commit /srv/salt/.git/hooks"
 
@@ -80,7 +89,6 @@ EOF
 rm /usr/bin/pinentry # Default symlink to pinentry-gtk-2
 ln -s /usr/bin/pinentry-tty /usr/bin/pinentry
 
-curl $gpgKeyUrl | gpg --import
 while ! gpg --card-status; do
     read -p "Insert yubikey and hit ENTER to continue ..."
 done
