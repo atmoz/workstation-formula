@@ -115,5 +115,5 @@ EOF
 umount -R /mnt
 clear
 
-echo "\nBootstrap complete!\n\nReboot when ready to continue installation."
+echo -e "\nBootstrap complete! \n\nReboot when ready to continue installation."
 
