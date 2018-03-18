@@ -1,3 +1,0 @@
-ghc:
-  pkg.installed
-

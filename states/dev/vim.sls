@@ -1,2 +1,0 @@
-gvim:
-  pkg.installed
