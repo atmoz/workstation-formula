@@ -4,23 +4,25 @@
 # https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/
 # https://github.com/Siilwyn/my-dotfiles/tree/master/.my-dotfiles
 set -eu
+fail() { echo >&2 "$@"; exit 1; }
 
-# Must clone with https, because salt-call is run with root
-# After clone, we set remote to ssh
-
-bin_repo_pub='https://github.com/atmoz/bin.git'
-bin_repo='git@github.com:atmoz/bin.git'
-
+# Must first clone with https, because salt-call is run without yubikey
+# After clone, we can set remote to ssh
 dotfiles_repo_pub='https://github.com/atmoz/dotfiles.git'
 dotfiles_repo='git@github.com:atmoz/dotfiles.git'
+gitdir=$HOME/.dotfiles
 
-if [ ! -d $HOME/bin ]; then
-    git clone $bin_repo_pub $HOME/bin
-    git -C $HOME/bin remote set-url origin $bin_repo
+if [ -d $gitdir ]; then
+    fail "$gitdir already exists. Aborting."
 fi
 
-git clone --bare $dotfiles_repo_pub $HOME/.dotfiles
-dotfiles="git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
+git clone --bare $dotfiles_repo_pub $gitdir
+dotfiles="git --git-dir=$gitdir --work-tree=$HOME"
+
+if ! $dotfiles verify-commit HEAD; then
+    rm -rf $gitdir
+    fail "GPG signature check failed for $dotfiles_repo!"
+fi
 
 if ! $dotfiles checkout -q 2>/dev/null; then
     # Backup any exsisting files
