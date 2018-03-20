@@ -80,6 +80,8 @@ if ! arch-chroot /mnt sh -c "cd $formulaGitDir && git verify-commit HEAD"; then
     fail "GPG signature check failed!"
 fi
 
+echo $hostname > /mnt/etc/salt/minion_id
+
 cat >/mnt/etc/salt/minion <<EOF
 state_verbose: False
 file_client: local
@@ -121,7 +123,7 @@ done
 ## Apply core state
 #####################################################################
 
-arch-chroot /mnt sh -c "salt-call --id $hostname state.apply $formulaId.core"
+arch-chroot /mnt sh -c "salt-call state.apply $formulaId.core"
 
 cat >/mnt/etc/motd <<EOF
 #####################################################################
