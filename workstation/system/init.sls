@@ -11,13 +11,13 @@
 ## Scripts and dotfiles
 #####################################################################
 
-salt://system/binfiles-init.sh:
+salt://workstation/system/binfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
     - creates: /home/{{ workstation.username }}/bin
 
-salt://system/dotfiles-init.sh:
+salt://workstation/system/dotfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
