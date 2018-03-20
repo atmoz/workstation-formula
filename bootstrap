@@ -20,8 +20,8 @@ if grep -qs /mnt /proc/mounts; then
     fail "/mnt is already mounted. Unmount it first, or edit this script."
 fi
 
-if [ ! -f $formulaGpg ]; then
-    fail "Missing $formulaGpg. Copy into current dir and try again"
+if [ ! -f $pillarGpg ]; then
+    fail "Missing $pillarGpg. Copy into current dir and try again"
 fi
 
 if ! gpg --check-sigs $publicKeyFingerprint; then
@@ -35,6 +35,13 @@ fi
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select disk to format" 0 0 0 $devicelist) || exit 1
 clear
+
+#####################################################################
+## Save stdout and stderr to file
+#####################################################################
+
+exec 1> >(tee -ia bootstrap.stdout.log)
+exec 2> >(tee -ia bootstrap.stderr.log >&2)
 
 #####################################################################
 ## Setup the disk and partitions
@@ -114,7 +121,7 @@ done
 ## Apply core state
 #####################################################################
 
-arch-chroot /mnt sh -c "salt-call state.apply core"
+arch-chroot /mnt sh -c "salt-call --id $hostname state.apply $formulaId.core"
 
 cat >/mnt/etc/motd <<EOF
 #####################################################################
