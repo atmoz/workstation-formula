@@ -1,4 +1,0 @@
-base:
-  '*':
-    - defaults
-    - secrets

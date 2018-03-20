@@ -1,12 +1,28 @@
 #!/bin/bash
 set -euo pipefail
 
+formulaId=workstation
 repo="$(dirname "$(readlink -f "$0")")"
-encrypted=~/.password-store/private/laptop-pillar-secrets.gpg
-decrypted=$repo/pillar/secrets.sls
+encrypted=~/.password-store/private/$formulaId.sls.gpg
+decrypted=/srv/pillar/$formulaId.sls
 
-# Use encrypted secrets, if available in password-store
-if [ -f "$encrypted" ]; then
+update=false
+
+# Check if encrypted pillar data is newer
+if [ -f "$encrypted" -a -f "$decrypted" ]; then
+    encryptedMtime="$(stat -t $encrypted | cut -d' ' -f13)"
+    decryptedMtime="$(stat -t $decrypted | cut -d' ' -f13)"
+
+    if [ $encryptedMtime -gt $decryptedMtime ]; then
+        echo "Updated pillar data detected. Decrypting ..."
+        update=true
+    fi
+elif [ -f "$encrypted" ]; then
+    echo "No decrypted pillar data found. Decrypting ..."
+    update=true
+fi
+
+if $update; then
     # decrypt pillar data with normal user, store file restricted to root only
     ( umask 077 && gpg -qd $encrypted | sudo tee $decrypted > /dev/null )
 fi
@@ -15,8 +31,4 @@ if [ ! -f "$decrypted" ]; then
     echo "Missing $decrypted. Aborting." >&2; exit 1
 fi
 
-sudo /usr/bin/salt-call \
-    --local \
-    --file-root=$repo/states \
-    --pillar-root=$repo/pillar \
-    "${@:-state.apply}"
+sudo /usr/bin/salt-call "${@:-state.apply}"

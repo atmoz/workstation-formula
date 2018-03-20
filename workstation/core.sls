@@ -2,6 +2,8 @@
 ### This is the only state used during bootstrap, when systemd is not
 ### available. Do not depend on systemd here!
 
+{% from "workstation/map.jinja" import workstation with context %}
+
 #####################################################################
 ## locale
 #####################################################################
@@ -31,14 +33,14 @@ en_US.UTF-8 UTF-8:
 
 /etc/hostname:
   file.managed:
-    - contents: {{ pillar['hostname'] }}
+    - contents: {{ workstation.hostname }}
 
 /etc/hosts:
   host.present:
     - ip: 127.0.0.1
     - names:
       - localhost
-      - {{ pillar['hostname'] }}
+      - {{ workstation.hostname }}
 
 wireless.packages:
   pkg.installed:
@@ -53,7 +55,7 @@ wireless.packages:
 
 /etc/pacman.d/mirrorlist:
   file.managed:
-    - contents: {{ pillar['pacman']['mirrorlist'] | yaml_encode }}
+    - contents: {{ workstation.pacman.mirrorlist | yaml_encode }}
 
 #####################################################################
 ## update
@@ -69,13 +71,13 @@ update-system:
 
 root:
   user.present:
-    - password: {{ pillar['users']['root']['password'] }}
+    - password: {{ workstation.users.root.password }}
 
-{{ pillar['username'] }}:
+{{ workstation.username }}:
   group.present: []
   user.present:
-    - password: {{ pillar['users'][pillar['username']]['password'] }}
-    - gid: {{ pillar['username'] }}
+    - password: {{ workstation.users[workstation.username].password }}
+    - gid: {{ workstation.username }}
     - groups:
       - wheel
       - uucp
@@ -101,4 +103,4 @@ sudo:
 
 /usr/local/bin/salt-call:
   file.symlink:
-    - target: /srv/salt/salt-call
+    - target: /srv/formulas/workstation-formula/salt-call

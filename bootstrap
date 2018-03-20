@@ -2,14 +2,15 @@
 # Forked from https://github.com/mdaffin/salt-arch
 set -Eeuxo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+fail() { echo >&2 "$@"; exit 1; }
 
-fail() {
-  echo >&2 "$@"
-  exit 1
-}
-
+hostname=atmoz-laptop
+formulaId=workstation
+formulaGitRemote=https://github.com/atmoz/$formulaId-formula.git
+formulaGitDir=/srv/formulas/$formulaId-formula
+pillarGpg=./$formulaId.sls.gpg
+pillar=/srv/pillar/$formulaId.sls
 publicKeyFingerprint=838460D0CBD26750AB26DF8FB9FB68F98F88BA47
-saltStateRepo=https://github.com/atmoz/salt-laptop.git
 
 #####################################################################
 ## Conditions
@@ -19,8 +20,8 @@ if grep -qs /mnt /proc/mounts; then
     fail "/mnt is already mounted. Unmount it first, or edit this script."
 fi
 
-if [ ! -f laptop-pillar-secrets.gpg ]; then
-    fail "Missing laptop-pillar-secrets.gpg. Copy into current dir and try again"
+if [ ! -f $formulaGpg ]; then
+    fail "Missing $formulaGpg. Copy into current dir and try again"
 fi
 
 if ! gpg --check-sigs $publicKeyFingerprint; then
@@ -59,15 +60,16 @@ arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
     && grub-mkconfig -o /boot/grub/grub.cfg"
 
 #####################################################################
-## Prepare and verify salt states
+## Prepare and verify salt states and configuration
 #####################################################################
 
 gpg --export -a $publicKeyFingerprint | arch-chroot /mnt sh -c "gpg --import"
 
-arch-chroot /mnt sh -c "git clone $saltStateRepo /srv/salt"
-arch-chroot /mnt sh -c "cp /srv/salt/pre-commit /srv/salt/.git/hooks"
+arch-chroot /mnt sh -c "mkdir -p /srv/{salt,formulas,pillar}"
+arch-chroot /mnt sh -c "git clone $formulaGitRemote $formulaGitDir"
+arch-chroot /mnt sh -c "cp $formulaGitDir/pre-commit $formulaGitDir/.git/hooks"
 
-if ! arch-chroot /mnt sh -c "cd /srv/salt && git verify-commit HEAD"; then
+if ! arch-chroot /mnt sh -c "cd $formulaGitDir && git verify-commit HEAD"; then
     fail "GPG signature check failed!"
 fi
 
@@ -76,10 +78,23 @@ state_verbose: False
 file_client: local
 file_roots:
   base:
-    - /srv/salt/states
+    - /srv/salt
+    - $formulaGitDir
 pillar_roots:
   base:
-    - /srv/salt/pillar
+    - /srv/pillar
+EOF
+
+cat >/mnt/srv/salt/top.sls <<EOF
+base:
+  $hostname:
+    - workstation
+EOF
+
+cat >/mnt/srv/pillar/top.sls <<EOF
+base:
+  $hostname:
+    - workstation
 EOF
 
 #####################################################################
@@ -93,7 +108,7 @@ while ! gpg --card-status; do
     read -p "Insert yubikey and hit ENTER to continue ..."
 done
 
-( umask 077 && gpg -d laptop-pillar-secrets.gpg > /mnt/srv/salt/pillar/secrets.sls )
+( umask 077 && gpg -d $pillarGpg > "/mnt$pillar" )
 
 #####################################################################
 ## Apply core state

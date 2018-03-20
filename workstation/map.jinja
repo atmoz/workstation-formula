@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# vim: ft=jinja
+
+{## Start with defaults from defaults.yaml ##}
+{% import_yaml 'workstation/defaults.yaml' as default_settings %}
+
+{## Merge in workstation pillar ##}
+{% set workstation = salt['pillar.get'](
+        'workstation',
+        default=default_settings.workstation,
+        merge=True
+    )
+%}

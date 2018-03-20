@@ -1,3 +1,5 @@
+{% from "workstation/map.jinja" import workstation with context %}
+
 #####################################################################
 ## https://bbs.archlinux.org/viewtopic.php?id=68591
 #####################################################################

@@ -1,3 +1,5 @@
+{% from "workstation/map.jinja" import workstation with context %}
+
 #####################################################################
 ## Remove message of the day after bootstrap
 #####################################################################
@@ -11,15 +13,15 @@
 
 salt://system/binfiles-init.sh:
   cmd.script:
-    - cwd: /home/{{ pillar['username'] }}
-    - runas: {{ pillar['username'] }}
-    - creates: /home/{{ pillar['username'] }}/bin
+    - cwd: /home/{{ workstation.username }}
+    - runas: {{ workstation.username }}
+    - creates: /home/{{ workstation.username }}/bin
 
 salt://system/dotfiles-init.sh:
   cmd.script:
-    - cwd: /home/{{ pillar['username'] }}
-    - runas: {{ pillar['username'] }}
-    - creates: /home/{{ pillar['username'] }}/.dotfiles
+    - cwd: /home/{{ workstation.username }}
+    - runas: {{ workstation.username }}
+    - creates: /home/{{ workstation.username }}/.dotfiles
 
 #####################################################################
 ## Sync time

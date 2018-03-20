@@ -1,0 +1,6 @@
+workstation:
+    users:
+        root:
+            password: secret
+        username:
+            password: secret

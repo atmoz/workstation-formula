@@ -1,3 +1,5 @@
+{% from "workstation/map.jinja" import workstation with context %}
+
 dev-packages:
   pkg.installed:
     - pkgs:
