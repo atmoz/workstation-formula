@@ -10,3 +10,4 @@ dev-packages:
       - git          # The stupid content tracker
       - ghc          # Haskell compiler
       - jdk8-openjdk # Java
+      - fzf          # Command-line fuzzy finder
