@@ -23,13 +23,13 @@ gnupg: pkg.installed
 ## Scripts and dotfiles
 #####################################################################
 
-salt://workstation/system/binfiles-init.sh:
+salt://workstation/files/binfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
     - creates: /home/{{ workstation.username }}/bin
 
-salt://workstation/system/dotfiles-init.sh:
+salt://workstation/files/dotfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
