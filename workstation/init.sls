@@ -1,7 +1,8 @@
 include:
-  - workstation.core
-  - workstation.system
-  - workstation.laptop
-  - workstation.wm
-  - workstation.dev
-  - workstation.browser
+  - .core
+  - .system
+  - .backup
+  - .laptop
+  - .wm
+  - .dev
+  - .browser
