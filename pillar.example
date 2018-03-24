@@ -1,6 +1,17 @@
 workstation:
     users:
         root:
-            password: secret
+            password: ***
         username:
-            password: secret
+            password: ***
+
+    backup:
+        local_key: ***
+        backblaze:
+            account: ***
+            key: ***
+            bucket: ***
+            path: ***
+        exclude_dirs:
+            - dir1
+            - dir2
