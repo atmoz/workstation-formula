@@ -11,3 +11,6 @@ dev-packages:
       - ghc          # Haskell compiler
       - jdk8-openjdk # Java
       - fzf          # Command-line fuzzy finder
+      - pandoc       # Converting different formats
+      - ranger       # Vim-like file manager
+      - ncdu         # Disk usage analyzer
