@@ -3,42 +3,17 @@
 duplicity: pkg.installed
 
 /root/backup:
-  file.directory:
+  file.recurse:
+    - source: salt://workstation/files/backup
+    - include_pat: "*.sh"
     - user: root
     - group: root
+    - file_mode: 700
 
 /root/backup/conf.sh:
   file.managed:
     - source: salt://workstation/files/backup/conf.sh.jinja
     - template: jinja
-    - user: root
-    - group: root
-    - mode: 700
-
-/root/backup/cleanup.sh:
-  file.managed:
-    - source: salt://workstation/files/backup/cleanup.sh
-    - user: root
-    - group: root
-    - mode: 700
-
-/root/backup/incremental.sh:
-  file.managed:
-    - source: salt://workstation/files/backup/incremental.sh
-    - user: root
-    - group: root
-    - mode: 700
-
-/root/backup/remove-old.sh:
-  file.managed:
-    - source: salt://workstation/files/backup/remove-old.sh
-    - user: root
-    - group: root
-    - mode: 700
-
-/root/backup/status.sh:
-  file.managed:
-    - source: salt://workstation/files/backup/status.sh
     - user: root
     - group: root
     - mode: 700
