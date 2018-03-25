@@ -3,6 +3,7 @@
 workstation:
     username: {{ username }}
     hostname: {{ username }}-laptop
+    wireless_interface: wlp3s0
 
     pacman:
         mirrorlist: |

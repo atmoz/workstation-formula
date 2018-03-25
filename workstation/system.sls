@@ -15,7 +15,7 @@ gnupg: pkg.installed
 
 838460D0CBD26750AB26DF8FB9FB68F98F88BA47:
   gpg.present:
-    - user: atmoz
+    - user: {{ workstation.username }}
     - keyserver: pgp.mit.edu
     - trust: ultimately
 
@@ -62,3 +62,15 @@ pcscd:
     - enable: true
     - require:
       - pkg: yubikey-gpg-deps
+
+#####################################################################
+## Wireless
+#####################################################################
+
+# Run backup script when connected to wifi
+/etc/netctl/interfaces/{{ workstation.wireless_interface }}:
+  file.managed:
+    - user: root
+    - group: root
+    - mode: 700
+    - contents: "ExecUpPost='/home/{{ workstation.username }}/bin/backup/local-to-cloud || true'"
