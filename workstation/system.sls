@@ -73,4 +73,4 @@ pcscd:
     - user: root
     - group: root
     - mode: 700
-    - contents: "ExecUpPost='/home/{{ workstation.username }}/bin/backup/local-to-cloud || true'"
+    - contents: "ExecUpPost='/usr/local/sbin/backup-notify.sh || true'"
