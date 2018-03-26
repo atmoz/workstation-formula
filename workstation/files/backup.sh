@@ -30,3 +30,38 @@ export GPG_ARGS="--use-agent \
 #echo "### Directories that will be ignored:"
 #find / -name .no-backup -type f
 
+function cleanup() {
+    echo "--- Cleanup ---"
+    # Cleanup failures
+    duplicity $GPG_ARGS cleanup --force $REMOTE_DIR/laptop
+    echo "--- Remove old backups ---"
+    duplicity $GPG_ARGS remove-all-inc-of-but-n-full 2 --force $REMOTE_DIR/laptop
+    duplicity $GPG_ARGS remove-older-than 1Y --force $REMOTE_DIR/laptop
+}
+
+function incremental() {
+echo "--- Backup ---"
+duplicity $GPG_ARGS \
+    --full-if-older-than 30D \
+    --exclude-if-present .no-backup \
+    --include /home \
+    --include /etc \
+    --include /srv \
+    --exclude / \
+    --progress \
+    / $REMOTE_DIR/laptop
+}
+
+function collection_status() {
+    echo "--- Status ---"
+    # Show collection-status
+    duplicity $GPG_ARGS collection-status $REMOTE_DIR/laptop
+}
+
+function run() {
+    incremental
+    cleanup
+    collection_status
+}
+
+${1:-run}

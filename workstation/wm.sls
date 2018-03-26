@@ -81,3 +81,20 @@ desktop-tools:
       - gcolor2  # Simple color picker
       - feh      # Image viewer
 
+#####################################################################
+## Notifications
+#####################################################################
+
+dunst:
+  pkg.installed
+
+/usr/local/bin/notify-send: # without .sh, so we replace the original notify-send
+  file.managed:
+    - source: salt://workstation/files/notify-send.sh
+    - mode: 755
+
+/usr/local/bin/action-action.sh:
+  file.managed:
+    - source: salt://workstation/files/notify-action.sh
+    - mode: 755
+

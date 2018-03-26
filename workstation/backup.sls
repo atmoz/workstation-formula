@@ -2,17 +2,17 @@
 
 duplicity: pkg.installed
 
-/root/backup:
-  file.recurse:
-    - source: salt://workstation/files/backup
-    - include_pat: "*.sh"
+/usr/local/sbin/backup.sh:
+  file.managed:
+    - source: salt://workstation/files/backup.sh
+    - template: jinja
     - user: root
     - group: root
-    - file_mode: 700
+    - mode: 700
 
-/root/backup/conf.sh:
+/usr/local/sbin/backup-notify.sh:
   file.managed:
-    - source: salt://workstation/files/backup/conf.sh.jinja
+    - source: salt://workstation/files/backup-notify.sh
     - template: jinja
     - user: root
     - group: root
