@@ -4,7 +4,7 @@ set -eu
 
 pid=$$
 user="{{ workstation.username }}"
-delay="$((60 * 1))"
+delay="$((60 * 5))"
 log="/var/log/last-backup.log"
 timeBetweenBackups="$((60 * 60 * 24))"
 now="$(date +%s)"
