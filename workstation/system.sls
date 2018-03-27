@@ -67,10 +67,20 @@ pcscd:
 ## Wireless
 #####################################################################
 
-# Run backup script when connected to wifi
 /etc/netctl/interfaces/{{ workstation.wireless_interface }}:
   file.managed:
     - user: root
     - group: root
     - mode: 700
-    - contents: "ExecUpPost='/usr/local/sbin/backup-notify.sh || true'"
+    - contents:
+      - "ExecUpPost='/usr/local/sbin/netctl-exec.sh wireless up $Profile || true'"
+      - "ExecDownPre='/usr/local/sbin/netctl-exec.sh wireless down $Profile || true'"
+
+/usr/local/sbin/netctl-exec.sh:
+  file.managed:
+    - source: salt://workstation/files/netctl-exec.sh
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 700
+

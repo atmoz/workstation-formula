@@ -8,10 +8,11 @@ delay="$((60 * 5))"
 log="/var/log/last-backup.log"
 timeBetweenBackups="$((60 * 60 * 24))"
 now="$(date +%s)"
+notifyId="$(basename $0)"
 
 function notifyUser() {
     export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $user)/bus
-    sudo -E -u $user notify-send "$@"
+    sudo -E -u $user notify-send --replace-file=/tmp/notify-$notifyId "$@"
 }
 
 function showTimer() {
@@ -22,13 +23,13 @@ function showTimer() {
         unit="min"
     fi
 
-    notifyUser -r $notifyId -i appointment-new -t $(($delay*1000+1000)) \
+    notifyUser -i appointment-new -t $(($delay*1000+1000)) \
         "Backup starting in $count $unit" \
         "$(($timeSinceLastBackup/60/60)) hours since last backup.\nKill $pid to abort."
 }
 
-function fail() { notifyUser -r $notifyId -u critical "Backup failed!" "See $log"; exit 1; }
-function abort() { notifyUser -r $notifyId "Backup aborted"; exit 0; }
+function fail() { notifyUser -u critical "Backup failed!" "See $log"; exit 1; }
+function abort() { notifyUser "Backup aborted"; exit 0; }
 
 trap fail ERR
 trap abort HUP INT TERM KILL
@@ -42,8 +43,6 @@ else
 fi
 
 if [ "$(($lastBackupTime + $timeBetweenBackups))" -lt "$now" ]; then
-    notifyId=$(notifyUser -p -i appointment-new "Backup starting ...")
-
     showTimer
 
     # Countdown
@@ -53,12 +52,12 @@ if [ "$(($lastBackupTime + $timeBetweenBackups))" -lt "$now" ]; then
         sleep 1
     done
 
-    notifyUser -r $notifyId -i network-transmit "Starting backup ..."
+    notifyUser -i network-transmit "Starting backup ..."
 
     /usr/local/sbin/backup.sh 2>&1 > $log
 
     if [ $? -eq 0 ]; then
-        notifyUser -r $notifyId -i face-smile "Backup completed" "See $log"
+        notifyUser -i face-smile "Backup completed" "See $log"
     else
         fail
     fi
