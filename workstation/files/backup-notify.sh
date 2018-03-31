@@ -57,7 +57,7 @@ if [ "$(($lastBackupTime + $timeBetweenBackups))" -lt "$now" ]; then
     /usr/local/sbin/backup.sh 2>&1 > $log
 
     if [ $? -eq 0 ]; then
-        notifyUser -i face-smile "Backup completed" "See $log"
+        notifyUser -i face-smile -t 0 "Backup completed" "See $log"
     else
         fail
     fi
