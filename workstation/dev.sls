@@ -14,3 +14,4 @@ dev-packages:
       - pandoc       # Converting different formats
       - ranger       # Vim-like file manager
       - ncdu         # Disk usage analyzer
+      - unrar
