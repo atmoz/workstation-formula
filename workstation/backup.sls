@@ -18,10 +18,10 @@ duplicity: pkg.installed
     - group: root
     - mode: 700
 
-{% if workstation.backup.exclude_dirs is defined %}
 {% for excluded in workstation.backup.exclude_dirs %}
+{% if salt['file.directory_exists' ](excluded) %}
 {{ excluded }}/.no-backup:
   file.managed:
     - replace: False
-{% endfor %}
 {% endif %}
+{% endfor %}
