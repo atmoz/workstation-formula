@@ -19,6 +19,11 @@ gnupg: pkg.installed
     - keyserver: pgp.mit.edu
     - trust: ultimately
 
+/home/{{ workstation.username }}/.gnupg:
+  file.directory:
+    - user: {{ workstation.username }}
+    - group: {{ workstation.username }}
+
 #####################################################################
 ## Scripts and dotfiles
 #####################################################################
