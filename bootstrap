@@ -60,7 +60,7 @@ mount $partition /mnt
 ## Install Arch Linux
 #####################################################################
 
-pacstrap /mnt base grub intel-ucode salt git gnupg
+pacstrap /mnt base grub git gnupg python2-gnupg salt
 genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
