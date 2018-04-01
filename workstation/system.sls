@@ -23,6 +23,9 @@ gnupg: pkg.installed
   file.directory:
     - user: {{ workstation.username }}
     - group: {{ workstation.username }}
+    - recurse:
+      - user
+      - group
 
 #####################################################################
 ## Scripts and dotfiles
