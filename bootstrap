@@ -1,10 +1,9 @@
 #!/bin/bash
 # Forked from https://github.com/mdaffin/salt-arch
-set -Eeuxo pipefail
+set -Eeuo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 fail() { echo >&2 "$@"; exit 1; }
 
-hostname=atmoz-laptop
 formulaId=workstation
 formulaGitRemote=https://github.com/atmoz/$formulaId-formula.git
 formulaGitDir=/srv/formulas/$formulaId-formula
@@ -29,12 +28,58 @@ if ! gpg --check-sigs $publicKeyFingerprint; then
 fi
 
 #####################################################################
+## Select username
+#####################################################################
+
+username="$(dialog --stdout --inputbox "Enter username" 0 0)"
+clear
+
+if [ -z "$username" ]; then
+    fail "No username given. Aborting."
+fi
+
+#####################################################################
+## Select hostname
+#####################################################################
+
+hostname="$(dialog --stdout --inputbox "Enter hostname" 0 0)"
+clear
+
+if [ -z "$hostname" ]; then
+    fail "No hostname given. Aborting."
+fi
+
+#####################################################################
+## Select states
+#####################################################################
+
+states="$(dialog --stdout --no-items \
+    --checklist "Select states" \
+    0 0 0 \
+    system  on  \
+    wm      on  \
+    dev     on  \
+    browser on  \
+    backup  off \
+    laptop  off \
+)"
+clear
+
+if [ -z "$states" ]; then
+    fail "No states selected. Aborting."
+fi
+
+#####################################################################
 ## Select disk
 #####################################################################
 
-devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-device=$(dialog --stdout --menu "Select disk to format" 0 0 0 $devicelist) || exit 1
+devicelist="$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)"
+device="$(dialog --stdout --menu "Select disk to format" 0 0 0 $devicelist)"
 clear
+
+if [ -z "$device" ]; then
+    fail "No disk selected. Aborting."
+fi
 
 #####################################################################
 ## Save stdout and stderr to file
@@ -97,13 +142,25 @@ EOF
 cat >/mnt/srv/salt/top.sls <<EOF
 base:
   $hostname:
-    - workstation
+    - $formulaId.core
+EOF
+
+for state in $states; do
+    echo "    - $formulaId.$state" >> /mnt/srv/salt/top.sls
+done
+
+# Save choosen username and hostname as local pillar data
+cat >/mnt/srv/pillar/$formulaId-local.sls <<EOF
+$formulaId:
+  username: $username
+  hostname: $hostname
 EOF
 
 cat >/mnt/srv/pillar/top.sls <<EOF
 base:
   $hostname:
-    - workstation
+    - $formulaId
+    - $formulaId-local
 EOF
 
 #####################################################################
@@ -117,12 +174,13 @@ while ! gpg --card-status; do
     read -p "Insert yubikey and hit ENTER to continue ..."
 done
 
-( umask 077 && gpg -d $pillarGpg > "/mnt$pillar" )
+( umask 077 && gpg -d $pillarGpg > /mnt$pillar )
 
 #####################################################################
 ## Apply core state
 #####################################################################
 
+echo "Applying core state ..."
 arch-chroot /mnt sh -c "salt-call state.apply $formulaId.core"
 
 cat >/mnt/etc/motd <<EOF
@@ -134,10 +192,13 @@ To complete the installation:
 * Setup a network connection
 * Run 'sudo salt-call state.apply'
 
+Remember to update encrypted pillar data to reflect
+choosen username and hostname.
+
 EOF
 
 umount -R /mnt
 clear
 
-echo -e "\nBootstrap complete! \n\nReboot when ready to continue installation."
+echo -e "\nBootstrap complete! \n\nReboot when ready to continue installation.\n"
 
