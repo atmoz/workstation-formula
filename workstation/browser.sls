@@ -10,3 +10,10 @@ firefox: pkg.installed
   file.comment:
     - regex: ^private-dev
 
+{% for container in workstation.browser.containers %}
+/home/{{ workstation.username }}/firejail-home/chromium/{{ container }}:
+  file.directory:
+    - user: {{ workstation.username }}
+    - group: {{ workstation.username }}
+    - makedirs: True
+{% endfor %}
