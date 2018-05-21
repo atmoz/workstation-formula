@@ -1,5 +1,7 @@
 {% from "workstation/map.jinja" import workstation with context %}
 
+cpulimit: pkg.installed
+
 firejail: pkg.installed
 
 chromium: pkg.installed

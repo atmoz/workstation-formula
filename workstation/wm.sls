@@ -21,6 +21,12 @@ gtk+:
     - pkgs:
       - gtk2
       - gtk3
+      - gtk-engines
+      - gtk-engine-murrine
+      - lxappearance
+      - adapta-gtk-theme
+      - gnome-themes-extra
+      - gnome-icon-theme
 
 #####################################################################
 ## terminal
