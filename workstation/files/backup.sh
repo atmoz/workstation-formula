@@ -44,7 +44,7 @@ function incremental() {
     duplicity $GPG_ARGS \
         --full-if-older-than 30D \
         --exclude-if-present .no-backup \
-        --include /home \
+        --include /home/keep \
         --include /etc \
         --include /srv \
         --exclude / \
