@@ -38,4 +38,4 @@ if [ ! -f "$decrypted" ]; then
     echo "Missing $decrypted. Aborting." >&2; exit 1
 fi
 
-sudo /usr/bin/salt-call "${@:-state.apply}"
+/usr/bin/salt-call "${@:-state.apply}"
