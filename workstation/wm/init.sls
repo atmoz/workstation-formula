@@ -96,11 +96,11 @@ dunst:
 
 /usr/local/bin/notify-send: # without .sh, so we replace the original notify-send
   file.managed:
-    - source: salt://workstation/files/notify-send.sh
+    - source: salt://workstation/wm/notify-send.sh
     - mode: 755
 
 /usr/local/bin/action-action.sh:
   file.managed:
-    - source: salt://workstation/files/notify-action.sh
+    - source: salt://workstation/wm/notify-action.sh
     - mode: 755
 

@@ -102,5 +102,9 @@ sudo:
 #####################################################################
 
 /usr/local/bin/salt-call:
-  file.symlink:
-    - target: /srv/formulas/workstation-formula/salt-call
+  file.managed:
+    - source: salt://workstation/core/salt-call
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 700

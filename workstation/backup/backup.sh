@@ -44,9 +44,11 @@ function incremental() {
     duplicity $GPG_ARGS \
         --full-if-older-than 30D \
         --exclude-if-present .no-backup \
-        --include /home/keep \
-        --include /etc \
-        --include /srv \
+{%- for include in workstation.backup.include_dirs %}
+{%- if salt['file.directory_exists'](include) %}
+        --include {{ include }} \
+{%- endif %}
+{%- endfor %}
         --exclude / \
         --progress \
         / $REMOTE_DIR/laptop

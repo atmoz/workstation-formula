@@ -1,20 +1,36 @@
+# vim: set sw=2 ts=2 sts=2 et:
 {% set username = 'atmoz' %}
 
 workstation:
-    username: {{ username }}
-    hostname: {{ username }}-laptop
-    wireless_interface: wlp3s0
 
-    pacman:
-        mirrorlist: |
-            Server = http://archlinux.uib.no/$repo/os/$arch
-            Server = http://mirror.f4st.host/archlinux/$repo/os/$arch
-            Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch
-            Server = http://ftp.portlane.com/pub/os/linux/archlinux/$repo/os/$arch
-            Server = http://www.mirrorservice.org/sites/ftp.archlinux.org/$repo/os/$arch
+  username: {{ username }}
+  hostname: {{ username }}-laptop
 
-    browser:
-        containers:
-            - trusted
-            - untrusted
-            - social
+  encrypted_pillar_path: /home/{{ username }}/.password-store/private/workstation.sls.gpg
+  decrypted_pillar_path: /srv/pillar/workstation.sls
+
+  wireless_interface: wlp3s0
+
+  pacman:
+    mirrorlist: |
+      Server = http://archlinux.uib.no/$repo/os/$arch
+      Server = http://mirror.f4st.host/archlinux/$repo/os/$arch
+      Server = http://mirror.bytemark.co.uk/archlinux/$repo/os/$arch
+      Server = http://ftp.portlane.com/pub/os/linux/archlinux/$repo/os/$arch
+      Server = http://www.mirrorservice.org/sites/ftp.archlinux.org/$repo/os/$arch
+
+  browser:
+    containers:
+      - trusted
+      - untrusted
+      - social
+
+  backup:
+    local_key: ...
+    backblaze:
+      account: ...
+      key: ...
+      bucket: ...
+      path: ...
+    include_dirs: []
+    exclude_dirs: []
