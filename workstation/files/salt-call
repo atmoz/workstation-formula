@@ -1,0 +1,41 @@
+#!/bin/bash
+#{% from "workstation/map.jinja" import workstation with context %}
+set -euxo pipefail
+
+# Force execution as root
+[[ $UID != 0 ]] && exec sudo -E "$(readlink -f "$0")" "$@"
+
+#dir="$(dirname "$(readlink -f "$0")")"
+username="{{ workstation.username }}"
+encrypted="{{ workstation.encrypted_pillar_path }}"
+decrypted="{{ workstation.decrypted_pillar_path }}"
+
+update=false
+
+# Check if encrypted pillar data is newer
+if [ -f "$encrypted" ] && [ -f "$decrypted" ]; then
+    encryptedMtime="$(stat -t "$encrypted" | cut -d' ' -f13)"
+    decryptedMtime="$(stat -t "$decrypted" | cut -d' ' -f13)"
+
+    if [ "$encryptedMtime" -gt "$decryptedMtime" ]; then
+        echo "Updated pillar data detected. Decrypting ..."
+        update=true
+    else
+        echo "Using already decrypted pillar data"
+    fi
+elif [ -f "$encrypted" ]; then
+    echo "No decrypted pillar data found. Decrypting ..."
+    update=true
+fi
+
+if $update; then
+    # decrypt pillar data with normal user, store file restricted to root only
+    # shellcheck disable=2024 # running script as root
+    ( umask 077 && sudo -u "$username" gpg -qd "$encrypted" > "$decrypted" )
+fi
+
+if [ ! -f "$decrypted" ]; then
+    echo "Missing $decrypted. Aborting." >&2; exit 1
+fi
+
+sudo /usr/bin/salt-call "${@:-state.apply}"
