@@ -11,6 +11,7 @@ formulaId=workstation
 formulaGitRemote=https://github.com/atmoz/$formulaId-formula.git
 formulaGitDir=/srv/formulas/$formulaId-formula
 pillarGpg=./$formulaId.sls.gpg
+pillarTmp=./$formulaId.sls
 pillar=/srv/pillar/$formulaId.sls
 publicKeyFingerprint=838460D0CBD26750AB26DF8FB9FB68F98F88BA47
 
@@ -29,6 +30,19 @@ fi
 if ! gpg --check-sigs $publicKeyFingerprint; then
     fail "Missing public key with fingerprint: $publicKeyFingerprint"
 fi
+
+#####################################################################
+## Decrypt secret pillar data
+#####################################################################
+
+rm /usr/bin/pinentry # Default symlink to pinentry-gtk-2
+ln -s /usr/bin/pinentry-tty /usr/bin/pinentry
+
+while ! gpg --card-status; do
+    read -rp "Insert yubikey and hit ENTER to continue ..."
+done
+
+( umask 077 && gpg -d $pillarGpg > $pillarTmp )
 
 #####################################################################
 ## Select disk
@@ -87,67 +101,15 @@ if ! arch-chroot /mnt sh -c "cd $formulaGitDir && git verify-commit HEAD"; then
     fail "GPG signature check failed!"
 fi
 
-
 #####################################################################
-## Select username
-#####################################################################
-
-username="$(dialog --stdout --inputbox "Enter username" 0 0)"
-clear
-
-if [ -z "$username" ]; then
-    fail "No username given. Aborting."
-fi
-
-#####################################################################
-## Select hostname
+## Setup temporary bootstrap Salt configuration
+## This will be updated by the "$formulaId.salt" state on first run
 #####################################################################
 
-hostname="$(dialog --stdout --inputbox "Enter hostname" 0 0)"
-clear
-
-if [ -z "$hostname" ]; then
-    fail "No hostname given. Aborting."
-fi
-
-#####################################################################
-## Select states
-#####################################################################
-
-pushd /mnt/$formulaGitDir/$formulaId
-shopt -s nullglob
-
-slsItems=""
-for state in */init.sls; do
-    slsItems="$slsItems $(dirname "$state") off"
-done
-for state in *.sls; do
-    if [ "$state" != "core.sls" ]; then
-        slsItems="$slsItems ${state//.sls/} off" # $(echo "$state" | sed 's/\(.*\).sls$/\1/') off"
-    fi
-done
-
-popd
-shopt -u nullglob
-
-# shellcheck disable=2086
-states="$(dialog --stdout --no-items \
-    --checklist "Select states (core included by default)" \
-    0 0 0 $slsItems )"
-clear
-
-if [ -z "$states" ]; then
-    fail "No states selected. Aborting."
-fi
-
-#####################################################################
-## Setup new Salt configuration
-#####################################################################
-
-echo "$hostname" > /mnt/etc/salt/minion_id
+cp $pillarTmp /mnt$pillar
+echo "localhost" > /mnt/etc/salt/minion_id
 
 cat >/mnt/etc/salt/minion <<EOF
-state_verbose: False
 file_client: local
 file_roots:
   base:
@@ -160,47 +122,23 @@ EOF
 
 cat >/mnt/srv/salt/top.sls <<EOF
 base:
-  $hostname:
+  localhost:
     - $formulaId.core
-EOF
-
-for state in $states; do
-    echo "    - $formulaId.$state" >> /mnt/srv/salt/top.sls
-done
-
-# Save choosen username and hostname as local pillar data
-cat >/mnt/srv/pillar/$formulaId-local.sls <<EOF
-$formulaId:
-  username: $username
-  hostname: $hostname
+    - $formulaId.salt
 EOF
 
 cat >/mnt/srv/pillar/top.sls <<EOF
 base:
-  $hostname:
+  localhost:
     - $formulaId
-    - $formulaId-local
 EOF
 
 #####################################################################
-## Decrypt secret pillar data
+## Apply states
 #####################################################################
 
-rm /usr/bin/pinentry # Default symlink to pinentry-gtk-2
-ln -s /usr/bin/pinentry-tty /usr/bin/pinentry
-
-while ! gpg --card-status; do
-    read -rp "Insert yubikey and hit ENTER to continue ..."
-done
-
-( umask 077 && gpg -d $pillarGpg > /mnt$pillar )
-
-#####################################################################
-## Apply core state
-#####################################################################
-
-echo "Applying core state ..."
-arch-chroot /mnt sh -c "salt-call state.apply $formulaId.core"
+echo "Applying core states ..."
+arch-chroot /mnt sh -c "salt-call state.apply"
 
 cat >/mnt/etc/motd <<EOF
 #####################################################################
@@ -210,9 +148,6 @@ cat >/mnt/etc/motd <<EOF
 To complete the installation:
 * Setup a network connection
 * Run 'sudo salt-call state.apply'
-
-Remember to update encrypted pillar data to reflect
-choosen username and hostname.
 
 EOF
 

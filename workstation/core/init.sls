@@ -96,15 +96,3 @@ sudo:
     - mode: 440
     - contents: |
         %wheel ALL=(ALL) ALL
-
-#####################################################################
-## salt-call
-#####################################################################
-
-/usr/local/bin/salt-call:
-  file.managed:
-    - source: salt://workstation/core/salt-call
-    - template: jinja
-    - user: root
-    - group: root
-    - mode: 700

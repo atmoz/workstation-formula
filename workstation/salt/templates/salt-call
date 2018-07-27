@@ -1,5 +1,7 @@
 #!/bin/bash
 #{% from "workstation/map.jinja" import workstation with context %}
+# This file is managed by salt
+#
 set -euxo pipefail
 
 # Force execution as root

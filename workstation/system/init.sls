@@ -31,13 +31,13 @@ gnupg: pkg.installed
 ## Scripts and dotfiles
 #####################################################################
 
-salt://workstation/system/binfiles-init.sh:
+salt://workstation/system/templates/binfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
     - creates: /home/{{ workstation.username }}/bin
 
-salt://workstation/system/dotfiles-init.sh:
+salt://workstation/system/templates/dotfiles-init.sh:
   cmd.script:
     - cwd: /home/{{ workstation.username }}
     - runas: {{ workstation.username }}
@@ -86,7 +86,7 @@ pcscd:
 
 /usr/local/sbin/netctl-exec.sh:
   file.managed:
-    - source: salt://workstation/system/netctl-exec.sh
+    - source: salt://workstation/system/templates/netctl-exec.sh
     - template: jinja
     - user: root
     - group: root
