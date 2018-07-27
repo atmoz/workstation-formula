@@ -4,6 +4,7 @@
 base:
   '{{ workstation.hostname }}':
     - workstation.core
+    - workstation.salt
     - workstation.system
     - workstation.browser
     - workstation.dev

@@ -4,4 +4,3 @@
 base:
   {{ workstation.hostname }}:
     - workstation
-    - workstation-local

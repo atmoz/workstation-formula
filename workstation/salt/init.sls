@@ -1,6 +1,6 @@
 {% from "workstation/map.jinja" import workstation with context %}
 
-/mnt/etc/salt/minion_id:
+/etc/salt/minion_id:
   file.managed:
     - content: {{ workstation.hostname }}
     - user: root
@@ -33,7 +33,7 @@
 
 /usr/local/bin/salt-call:
   file.managed:
-    - source: salt://workstation/core/salt-call
+    - source: salt://workstation/salt/templates/salt-call
     - template: jinja
     - user: root
     - group: root
