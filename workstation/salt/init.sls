@@ -2,7 +2,7 @@
 
 /etc/salt/minion_id:
   file.managed:
-    - content: {{ workstation.hostname }}
+    - contents: {{ workstation.hostname }}
     - user: root
     - group: root
     - mode: 700
@@ -10,6 +10,14 @@
 /etc/salt/minion:
   file.managed:
     - source: salt://workstation/salt/templates/salt/minion
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 700
+
+/etc/salt/master:
+  file.managed:
+    - source: salt://workstation/salt/templates/salt/master
     - template: jinja
     - user: root
     - group: root

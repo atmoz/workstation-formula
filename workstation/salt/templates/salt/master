@@ -1,0 +1,13 @@
+# This file is managed by salt
+
+state_verbose: False
+
+file_roots:
+  base:
+    - /srv/formulas/devproxy-formula
+    - /srv/formulas/atmoz-net-formula
+
+pillar_roots:
+  base:
+    - /srv/pillar
+

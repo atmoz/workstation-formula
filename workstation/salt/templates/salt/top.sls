@@ -2,7 +2,7 @@
 # This file is managed by salt
 
 base:
-  '{{ workstation.hostname }}':
+  {{ workstation.hostname }}:
     - workstation.core
     - workstation.salt
     - workstation.system
@@ -11,10 +11,10 @@ base:
     - workstation.wm
     - workstation.backup
 
-  'devproxy':
+  devproxy:
     - devproxy.core
     - devproxy.dev
     - devproxy.wm
 
-  'carbon':
+  carbon:
     - atmoz-net
