@@ -4,6 +4,7 @@ state_verbose: False
 
 file_roots:
   base:
+    - /srv/salt
     - /srv/formulas/devproxy-formula
     - /srv/formulas/atmoz-net-formula
 
