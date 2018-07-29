@@ -11,6 +11,9 @@ workstation:
 
   wireless_interface: wlp3s0
 
+  salt:
+    roster: ...
+
   pacman:
     mirrorlist: |
       Server = http://archlinux.uib.no/$repo/os/$arch

@@ -23,6 +23,14 @@
     - group: root
     - mode: 700
 
+/etc/salt/roster:
+  file.managed:
+    - contents: {{ workstation.salt.roster | yaml_encode }}
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 700
+
 /srv/salt/top.sls:
   file.managed:
     - source: salt://workstation/salt/templates/salt/top.sls
