@@ -107,7 +107,7 @@ fi
 #####################################################################
 
 cp $pillarTmp /mnt$pillar
-echo "localhost" > /mnt/etc/salt/minion_id
+echo "bootstrap" > /mnt/etc/salt/minion_id
 
 cat >/mnt/etc/salt/minion <<EOF
 file_client: local
@@ -122,14 +122,14 @@ EOF
 
 cat >/mnt/srv/salt/top.sls <<EOF
 base:
-  localhost:
+  bootstrap:
     - $formulaId.core
     - $formulaId.salt
 EOF
 
 cat >/mnt/srv/pillar/top.sls <<EOF
 base:
-  localhost:
+  bootstrap:
     - $formulaId
 EOF
 
