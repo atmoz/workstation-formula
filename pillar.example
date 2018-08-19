@@ -7,6 +7,7 @@ workstation:
 
   backup:
     local_key: ***
+    external_uuid: ***
     backblaze:
       account: ***
       key: ***

@@ -8,9 +8,10 @@ chromium: pkg.installed
 
 firefox: pkg.installed
 
-/etc/firejail/chromium.profile:
-  file.comment:
-    - regex: ^private-dev
+# No longer needed
+#/etc/firejail/chromium.profile:
+#  file.comment:
+#    - regex: ^private-dev
 
 {% for container in workstation.browser.containers %}
 /home/{{ workstation.username }}/.firejail-home/chromium/{{ container }}:

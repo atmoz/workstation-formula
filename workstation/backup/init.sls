@@ -2,9 +2,14 @@
 
 duplicity: pkg.installed
 
+b2:
+  pip.installed:
+    - require:
+      - pkg: python-pip
+
 /usr/local/sbin/backup.sh:
   file.managed:
-    - source: salt://workstation/backup/backup.sh
+    - source: salt://workstation/backup/files/backup.sh
     - template: jinja
     - user: root
     - group: root
@@ -12,7 +17,7 @@ duplicity: pkg.installed
 
 /usr/local/sbin/backup-notify.sh:
   file.managed:
-    - source: salt://workstation/backup/backup-notify.sh
+    - source: salt://workstation/backup/files/backup-notify.sh
     - template: jinja
     - user: root
     - group: root
