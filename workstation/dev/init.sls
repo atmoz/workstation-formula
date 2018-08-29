@@ -13,6 +13,7 @@ dev-packages:
       - dep          # Go dependency management tool
       - ghc          # Haskell compiler
       - jdk8-openjdk # Java
+      - ack          # A tool like grep, optimized for programmers
       - fzf          # Command-line fuzzy finder
       - pandoc       # Converting different formats
       - ranger       # Vim-like file manager
