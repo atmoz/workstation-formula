@@ -4,6 +4,7 @@ dev-packages:
   pkg.installed:
     - pkgs:
       - gvim         # Vim with extras (like clipboard)
+      - nvim         # NeoVim
       - openssh      # SSH client
       - gephi        # The Open Graph Viz Platform
       - gdb          # The GNU Debugger
