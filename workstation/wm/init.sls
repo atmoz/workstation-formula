@@ -89,6 +89,7 @@ desktop-tools:
       - nitrogen # Desktop background manager
       - gcolor2  # Simple color picker
       - feh      # Image viewer
+      - pamixer  # Pulseaudio command-line mixer like amixer
 
 #####################################################################
 ## Notifications
