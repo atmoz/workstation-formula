@@ -23,3 +23,5 @@ dev-packages:
       - pv           # Monitoring the progress of data through a pipeline
       - unrar        # Unzip that zip!
       - shellcheck   # Shell script analysis tool
+      - keybase      # CLI tool for GPG with keybase.io
+      - kbfs         # The Keybase filesystem
