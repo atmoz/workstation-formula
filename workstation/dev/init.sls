@@ -3,6 +3,7 @@
 dev-packages:
   pkg.installed:
     - pkgs:
+      - base-devel   # make, etc ...
       - htop         # Interactive process viewer
       - gvim         # Vim with extras (like clipboard)
       - neovim       # NeoVim
