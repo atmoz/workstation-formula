@@ -1,11 +1,9 @@
 {% from "workstation/map.jinja" import workstation with context %}
 
-duplicity: pkg.installed
+restic: pkg.installed
 
 b2:
-  pip.installed:
-    - require:
-      - pkg: python-pip
+  pip.installed
 
 /usr/local/sbin/backup.sh:
   file.managed:
