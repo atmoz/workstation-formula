@@ -71,6 +71,13 @@ fonts:
       - xorg-fonts-100dpi
       - xorg-fonts-75dpi
       - xorg-fonts-misc
+      - ttf-croscore
+      - ttf-dejavu
+      - ttf-droid
+      - ttf-roboto
+      - noto-fonts
+      - ttf-liberation
+      - ttf-ubuntu-font-family
 
 #####################################################################
 ## Drivers
@@ -97,10 +104,15 @@ display-driver:
 desktop-tools:
   pkg.installed:
     - pkgs:
+      - arandr   # A simple visual front end for XRandR
+      - flatpak  # Linux application sandboxing
       - nitrogen # Desktop background manager
       - gcolor2  # Simple color picker
       - feh      # Image viewer
       - pamixer  # Pulseaudio command-line mixer like amixer
+      - redshift # Adjusts the color temperature of your screen
+      - gnome-disk-utility # Disk Management Utility
+      - pavucontrol # PulseAudio Volume Control
 
 #####################################################################
 ## Notifications

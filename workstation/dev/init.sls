@@ -3,8 +3,9 @@
 dev-packages:
   pkg.installed:
     - pkgs:
+      - htop         # Interactive process viewer
       - gvim         # Vim with extras (like clipboard)
-      - nvim         # NeoVim
+      - neovim       # NeoVim
       - openssh      # SSH client
       - gephi        # The Open Graph Viz Platform
       - gdb          # The GNU Debugger
@@ -25,3 +26,4 @@ dev-packages:
       - shellcheck   # Shell script analysis tool
       - keybase      # CLI tool for GPG with keybase.io
       - kbfs         # The Keybase filesystem
+      - python-pylint # Analyzes Python code

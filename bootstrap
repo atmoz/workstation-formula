@@ -68,14 +68,38 @@ exec 2> >(tee -ia bootstrap.stderr.log >&2)
 ## Setup the disk and partitions
 #####################################################################
 
-parted --script "$device" -- mktable gpt \
-    mkpart primary ext2 1Mib 2MiB \
-    set 1 bios_grub on \
-    mkpart primary ext4 2MiB 100%
+bootPart="${device}1"
+bootName=boot
+bootSize="551MiB"
 
-partition="${device}2"
-mkfs.ext4 "$partition"
-mount "$partition" /mnt
+rootPart="${device}2"
+rootName=root
+rootSize="128GiB"
+
+homePart="${device}3"
+homeName=home
+homeSize="100%"
+
+parted --script "$device" -- mktable gpt \
+    mkpart primary fat32 1Mib $bootSize \
+    name 1 $bootName \
+    set 1 esp on \
+    mkpart primary ext4 $bootSize $rootSize \
+    name 2 $rootName \
+    mkpart primary ext4 $rootSize $homeSize \
+    name 3 $homeName \
+    print
+
+mkfs.ext4 "$rootPart"
+mount "$rootPart" /mnt
+
+mkfs.fat -F32 "$bootPart"
+mkdir -p /mnt/boot
+mount "$bootPart" /mnt/boot
+
+mkfs.ext4 "$homePart"
+mkdir -p /mnt/home
+mount "$homePart" /mnt/home
 
 #####################################################################
 ## Install Arch Linux
@@ -84,8 +108,27 @@ mount "$partition" /mnt
 pacstrap /mnt base grub git gnupg python2-gnupg salt
 genfstab -U /mnt >> /mnt/etc/fstab
 
-arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
-    && grub-mkconfig -o /boot/grub/grub.cfg"
+#####################################################################
+## Install bootloader
+#####################################################################
+
+#arch-chroot /mnt sh -c "grub-install --target=i386-pc $device \
+#    && grub-mkconfig -o /boot/grub/grub.cfg"
+arch-chroot /mnt sh -c "bootctl --path=/boot install"
+
+cat >/boot/loader/loader.conf <<EOF
+default arch
+editor no
+console-mode max
+EOF
+
+cat >/mnt/boot/loader/entries/arch.conf <<EOF
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux.img
+options root=LABEL=$rootName rw
+EOF
 
 #####################################################################
 ## Download and verify salt states

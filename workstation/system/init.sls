@@ -71,11 +71,37 @@ pcscd:
     - require:
       - pkg: yubikey-gpg-deps
 
+pcscd.socket:
+  service.running:
+    - enable: true
+    - require:
+      - pkg: yubikey-gpg-deps
+
+/etc/udev/rules.d/70-u2f.rules:
+  file.managed:
+    - source: salt://workstation/system/templates/70-u2f.rules
+    - user: root
+    - group: root
+    - mode: 644
+
 #####################################################################
 ## Python and pip
 #####################################################################
 
 python-pip:
+  pkg.installed
+
+python2-pip:
+  pkg.installed
+
+#####################################################################
+## Password Store
+#####################################################################
+
+pass:
+  pkg.installed
+
+xdotool:
   pkg.installed
 
 #####################################################################

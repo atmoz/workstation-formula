@@ -41,6 +41,8 @@ en_US.UTF-8 UTF-8:
     - names:
       - localhost
       - {{ workstation.hostname }}
+  file.append:
+    - source: salt://workstation/core/files/hosts
 
 wireless.packages:
   pkg.installed:
