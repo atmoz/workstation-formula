@@ -11,6 +11,7 @@ base:
     - workstation.wm
     - workstation.backup
     - workstation.laptop
+    - workstation.lxc
 
   devproxy:
     - devproxy.core
