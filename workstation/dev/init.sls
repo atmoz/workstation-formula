@@ -28,3 +28,4 @@ dev-packages:
       - keybase      # CLI tool for GPG with keybase.io
       - kbfs         # The Keybase filesystem
       - python-pylint # Analyzes Python code
+      - dstat        # A versatile resource statistics tool
