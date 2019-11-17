@@ -1,0 +1,39 @@
+partial keypad_keys
+xkb_symbols "capsmod" {
+
+  include "us(basic)"
+
+  key <CAPS> { [ ISO_Level3_Shift ] };
+
+  // Norwegian chars
+  key <AD11> { [ bracketleft, braceleft, aring, Aring ] };
+  key <AC10> { [ semicolon, colon, oslash, Ooblique ] };
+  key <AC11> { [ apostrophe, quotedbl, ae, AE ] };
+
+  // Alternative arrows
+  key <AD08> { type="THREE_LEVEL", [ i, I, Up, Up ] };
+  key <AC08> { type="THREE_LEVEL", [ k, K, Down, Down ] };
+  key <AC07> { type="THREE_LEVEL", [ j, J, Left, Left ] };
+  key <AC09> { type="THREE_LEVEL", [ l, L, Right, Right ] };
+
+  // Alternative pagination keys
+  key <AC06> { [ h, H, Home ] };
+  key <AB06> { [ n, N, End ] };
+  key <AD07> { [ u, U, Prior ] };
+  key <AD09> { [ o, O, Next ] };
+
+  // Alternative delete key
+  key <BKSP> { [ BackSpace, BackSpace, Delete ] };
+
+  // Disable normal keys to break the habit of using them instead of alt keys
+  key <UP> { [ Tab ] };
+  key <DOWN> { [ Tab ] };
+  key <LEFT> { [ Tab ] };
+  key <RGHT> { [ Tab ] };
+  key <PGUP> { [ Tab ] };
+  key <PGDN> { [ Tab ] };
+  key <HOME> { [ Tab ] };
+  key <END> { [ Tab ] };
+  key <DELE> { [ Tab ] };
+
+};

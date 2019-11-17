@@ -131,3 +131,17 @@ dunst:
     - source: salt://workstation/wm/notify-action.sh
     - mode: 755
 
+#####################################################################
+## Modified keyboard layout
+#####################################################################
+
+/usr/share/X11/xkb/types/iso9995:
+  file.managed:
+    - source: salt://workstation/wm/xkb/types/iso9995
+    - mode: 755
+
+/usr/share/X11/xkb/symbols/capsmod:
+  file.managed:
+    - source: salt://workstation/wm/xkb/symbols/capsmod
+    - mode: 755
+
